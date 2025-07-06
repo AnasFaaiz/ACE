@@ -40,6 +40,11 @@ ACE/
 - projects.json: A.C.E.'s memory. A database of all managed projects, their local paths, and remote URLs.
 - .env: Securely stores secret credentials like the `GITHUB_TOKEN`.
 
+- Commands Needed:
+  - python3 -m src.main project register [local_project_address] -> This is to register project with ACE
+  - python3 -m src.main project list -> This to list out all the projects registered with ACE
+  - acego [project_name] -> This is to navigate through the registered projects
+
 * Interaction Methods
 
 A.C.E. will be controlled through two primary methods:
@@ -92,3 +97,5 @@ This follows the three-phase plan from the `ace_custom_ai_roadmap`.
     - "make a new react app called portfolio"
     - "ace can you scaffold a nextjs project named blog"
     - "i need a fresh python project"
+
+
