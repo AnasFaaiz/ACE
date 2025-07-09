@@ -11,6 +11,7 @@ import argparse
 from src.features import project_manager
 from src.features import news_hub
 from src.features import project_scaffolder
+from src.features import vanguard
 
 def main():
     """
@@ -64,6 +65,10 @@ def main():
     # New command: 'project create'
     create_parser = project_actions.add_parser('create', help='create a new project using a template.')
     create_parser.add_argument('name', type=str, help='The name of new project.')
+
+    # Action Command: 'ace save'
+    git_parser = subparsers.add_parser('save', help='The Vanguard: Save your project work.')
+    git_parser.add_argument('nickname', type=str, help='The nickname of the registered project to save.')
 
 
     # This line reads all the arguments that were typed in the terminal.
@@ -120,6 +125,10 @@ def main():
         for headline in headlines:
             print(headline)
         print("------------------------------")
+    
+    elif args.command == 'save':
+        result = vanguard.save_workflow(args.nickname)
+        print(result)
 
 # This standard Python line ensures that the main() function is called only when the script is executed.
 if __name__ == "__main__":
