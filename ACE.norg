@@ -1,9 +1,9 @@
 @document.meta
     title: A.C.E. Project Blueprint
     author: Anas Faaiz
-    version: 1.0
-    created: 2025-07-01
-    description: The complete vision, feature set, architecture, and roadmap for the Automated Command Environment (A.C.E.), a personalized AI developer assistant.
+    version: 1.1
+    updated: 2025-07-09
+    description: The complete vision, feature set, architecture, and roadmap for the Automated Command Environment (A.C.E.). This version reflects the completion of core project management and information hub features.
 @end
 
 * A.C.E. - The Vision
@@ -20,13 +20,13 @@ ACE/
 ├── src/
 │   ├── init.py
 │   ├── main.py
-│   └── features/
+     │   └── features/
 │       ├── init.py
 │       ├── project_manager.py
+│       ├── project_scaffolder.py
 │       ├── vanguard.py
 │       ├── news_hub.py
-│       ├── task_scheduler.py
-│       └── voice_handler.py
+│       └── ... (other skills)
 │
 ├── .env
 ├── .gitignore
@@ -35,67 +35,59 @@ ACE/
 └── requirements.txt
 
 
-- /src/main.py: The main entry point. Its only job is to parse terminal commands and call the correct skill.
+- /src/main.py: The main entry point. Parses terminal commands and calls the correct skill.
 - /src/features/: The "toolbox". Each `.py` file is a module dedicated to a specific skill.
-- projects.json: A.C.E.'s memory. A database of all managed projects, their local paths, and remote URLs.
+- projects.json: A.C.E.'s memory. A database of all managed projects.
 - .env: Securely stores secret credentials like the `GITHUB_TOKEN`.
-
-- Commands Needed:
-  - python3 -m src.main project register [local_project_address] -> This is to register project with ACE
-  - python3 -m src.main project list -> This to list out all the projects registered with ACE
-  - acego [project_name] -> This is to navigate through the registered projects
 
 * Interaction Methods
 
-A.C.E. will be controlled through two primary methods:
+A.C.E. is controlled through two primary methods:
 
-- *Command Line:* Fast, precise commands for developers (e.g., `ace project create ...`).
-- *Voice Based:* An "always-on" listener mode (`ace listen`) that uses a wakeword ("ACE respond") to activate and process natural language commands.
+- [x] *Command Line:* Fast, precise commands for developers (e.g., `ace project create ...`).
+- [ ] *Voice Based:* An "always-on" listener mode (`ace listen`) that uses a wakeword to activate and process natural language commands.
 
 * Finalized Feature Set (v1.0 & v2.0)
 
 ** Workspace Management
-  - `ace project create [name] --template [type]`: Instantly creates project folders from templates (react, python, etc.).
-  - `ace project register [path]`: Automatically scans an existing local Git repo, finds its GitHub URL via API, and saves it to `projects.json`.
-  - `ace project list`: Displays all projects managed by A.C.E.
-  - `ace project remove [name]`: Safely removes a project from the registry.
+  - [x] `ace project create [name]`: Instantly creates project folders from templates (React, Next.js, Vite).
+  - [x] `ace project register [path]`: Automatically scans an existing local Git repo, finds its GitHub URL via API, and saves it to `projects.json`.
+  - [x] `ace project list`: Displays all projects managed by A.C.E.
+  - [ ] `ace project remove [name]`: Safely removes a project from the registry.
+  - [x] `acego [nickname]`: A shell helper function to instantly navigate to any registered project directory.
 
 ** The Vanguard (Git Integration)
-  - `ace git activate [nickname]`: An interactive workflow that shows status, asks for confirmation, then runs `git add .`, `git commit`, and `git push` to the correct feature branch (with a safety lock on `main`/`master`).
-  - `ace git sync [nickname]`: Safely pulls the latest changes from the remote repository.
+  - [ ] `ace git activate [nickname]`: An interactive workflow that shows status, asks for confirmation, then runs `git add .`, `git commit`, and `git push` to the correct feature branch.
+  - [ ] `ace git sync [nickname]`: Safely pulls the latest changes from the remote repository.
 
 ** Information & Automation
-  - `ace news [--source] [--topic]`: Fetches tech news from sources like Hacker News, with options to filter.
-  - `ace schedule "[time]" "[command]"`: A command-line interface to schedule any A.C.E. task to run at a later time.
+  - [x] `ace news [--source] [--limit]`: Fetches tech news from sources like Hacker News, with options to filter.
+  - [ ] `ace schedule "[time]" "[command]"`: A command-line interface to schedule any A.C.E. task to run at a later time.
 
 * AI & NLP Strategy (The Custom Brain)
 
-This follows the three-phase plan from the `ace_custom_ai_roadmap`.
+This is the final phase of the project, to be started after all core command-line tools are built and tested.
 
 - *Phase 1: Foundation & Data Collection*
-  - Build the non-AI versions of all core features first (e.g., `project create`, `git activate`).
-  - As each feature is built, simultaneously create a `training_data.jsonl` file. Populate it with 10-15 examples of how you would ask for that command in natural language.
+  - Build the non-AI versions of all core features first.
+  - As each feature is built, simultaneously create a `training_data.jsonl` file with examples of how you would ask for that command in natural language.
 
 - *Phase 2: The Training Ground*
   - Use Python libraries like `transformers`, `datasets`, and `torch`.
-  - Write a separate training script (`train_ace_model.py`).
-  - This script will fine-tune a small, powerful language model (**DistilBERT**) using your custom `training_data.jsonl`.
+  - Write a separate training script to fine-tune a small, powerful language model (**DistilBERT**) using your custom data.
   - The goal is to teach the model to recognize your *intent* (e.g., `create_project`) and extract *entities* (e.g., `projectName: "photon"`).
-  - The final trained model will be saved locally.
 
 - *Phase 3: Integration & Inference*
-  - Create a new skill, `nlp_parser.py`.
-  - This skill will load your custom-trained local model.
-  - It will take the text from a voice command, feed it to the model, and get back a structured JSON object (e.g., `{"intent": "create_project", "entities": {...}}`).
-  - The `main.py` will then use this JSON to call the correct function with the correct parameters.
+  - Create a new skill, `nlp_parser.py`, that loads your custom-trained local model.
+  - The `ace listen` command will use this local model to parse your voice commands into structured actions, which then call the appropriate functions.
 
 * Current Task & Immediate Next Step
 
-**Work on Phase 1 of the AI Roadmap.**
-1.  **Build the Tool:** Focus on building the standard, command-line version of the `ace project create [name] --template [type]` feature. This involves writing the logic in `project_scaffolder.py` to create the necessary files and folders for different tech stacks (e.g., a simple Python app template).
-2.  **Collect the Data:** As you build this command, open `training_data.jsonl` and start writing down all the ways you might ask for it.
-    - "make a new react app called portfolio"
-    - "ace can you scaffold a nextjs project named blog"
-    - "i need a fresh python project"
+**Build "The Vanguard" (Git Integration).**
+Now that the project management and information hub foundations are complete, the next logical step is to build the most powerful automation feature.
+1.  **Build the Tool:** Focus on building the interactive, command-line version of the `ace git activate [nickname]` command. This involves writing the logic in `vanguard.py` to check the current branch, show the status, ask for confirmation, and then run the `add`, `commit`, and `push` sequence.
+2.  **Collect the Data:** As you build this command, add examples to your `training_data.jsonl` file.
+    - "ace save my work on the login feature"
+    - "activate my changes, message is fixed the styling"
 
 
