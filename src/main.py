@@ -9,6 +9,7 @@ sys.path.insert(0, project_root)
 import argparse
 # We import the entire project_manager module to access all its functions.
 from .features import project_manager 
+from .features import news_hub
 
 def main():
     """
@@ -42,6 +43,23 @@ def main():
     # Tell the 'go' parser that it must be followed by a 'nickname' argument.
     go_parser.add_argument('nickname', type=str, help='The nickname of the project to navigate to.')
 
+    news_parser = subparsers.add_parser('news', help='Fetch the latest tech news.')
+
+    # Add an option argument '--source'.
+    news_parser.add_argument(
+        '--source',
+        type=str,
+        default='hackernews',
+        help='The news source to fetch from (e.g., hackernews, techcrunch).'
+    )
+    # Add an optionalargument '--limit'.
+    news_parser.add_argument(
+        '--limit',
+        type=int,
+        default=7,
+        help='The number of arcticles to display.'
+    )
+
     # This line reads all the arguments that were typed in the terminal.
     args = parser.parse_args()
 
@@ -65,6 +83,17 @@ def main():
             navigation_command = project_manager.get_navigation_command(args.nickname)
             # We print the result, which will be our 'cd ...' command or an error.
             print(navigation_command)
+    # News logic        
+    elif args.command == 'news':
+        # Call the get_news function from our news_hub.
+        headlines = news_hub.get_news(source_name=args.source, limit=args.limit)
+
+        print(f"\n--- Latest from {args.source.title()} ---")
+
+        # Loop through headlines & print each.
+        for headline in headlines:
+            print(headline)
+        print("------------------------------")
 
 # This standard Python line ensures that the main() function is called only when the script is executed.
 if __name__ == "__main__":
