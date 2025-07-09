@@ -8,8 +8,10 @@ sys.path.insert(0, project_root)
 
 import argparse
 # We import the entire project_manager module to access all its functions.
-from .features import project_manager 
-from .features import news_hub
+from src.features import project_manager
+from src.features import news_hub
+from src.features import project_scaffolder
+from src.features import vanguard
 
 def main():
     """
@@ -60,13 +62,42 @@ def main():
         help='The number of arcticles to display.'
     )
 
+    # New command: 'project create'
+    create_parser = project_actions.add_parser('create', help='create a new project using a template.')
+    create_parser.add_argument('name', type=str, help='The name of new project.')
+
+    # Action Command: 'ace save'
+    git_parser = subparsers.add_parser('save', help='The Vanguard: Save your project work.')
+    git_parser.add_argument('nickname', type=str, help='The nickname of the registered project to save.')
+
+
     # This line reads all the arguments that were typed in the terminal.
     args = parser.parse_args()
 
     # --- Logic to call the correct function ---
     
     if args.command == 'project':
-        if args.action == 'register':
+        if args.action == 'create':
+            # Interactive part of workflow
+            template = input("What kind of project is this? (e.g., react, nextjs, vite, python): ")
+
+            default_project_path = os.path.expanduser('~/Documents/0-Projects')
+
+            location_prompt = f"Where should I create this project? (Press Enter for default: {default_project_path}): "
+            location_input = input(location_prompt)
+
+            if not location_input:
+                final_location = default_project_path
+            else:
+                final_location = os.path.expanduser(location_input)
+
+            os.makedirs(final_location, exist_ok=True)
+
+            result = project_scaffolder.create_project(args.name, template, final_location)
+            print(result)
+
+
+        elif args.action == 'register':
             # We call the register function with the path the user provided.
             result = project_manager.register_project(args.path)
             print(result)
@@ -94,6 +125,10 @@ def main():
         for headline in headlines:
             print(headline)
         print("------------------------------")
+    
+    elif args.command == 'save':
+        result = vanguard.save_workflow(args.nickname)
+        print(result)
 
 # This standard Python line ensures that the main() function is called only when the script is executed.
 if __name__ == "__main__":
