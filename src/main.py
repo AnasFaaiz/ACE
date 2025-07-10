@@ -12,6 +12,9 @@ from src.features import project_manager
 from src.features import news_hub
 from src.features import project_scaffolder
 from src.features import vanguard
+from src.features import task_scheduler
+from src.features import dashboard_manager
+
 
 def main():
     """
@@ -72,6 +75,30 @@ def main():
     
     # New command: 'ace overview'
     overview_parser = subparsers.add_parser('overview', help='Get a high-level overview of all registered Git projects.')
+
+# --- NEW: Command Group 'schedule' (for managing jobs) ---
+    schedule_parser = subparsers.add_parser('schedule', help='Manage scheduled tasks.')
+    schedule_actions = schedule_parser.add_subparsers(dest='action', help='Schedule actions', required=True)
+    
+    # Action: 'add'
+    add_job_parser = schedule_actions.add_parser('add', help='Add a new task to the schedule.')
+    add_job_parser.add_argument('time_string', type=str, help='When to run (e.g., "every day at 10:30").')
+    add_job_parser.add_argument('command_string', type=str, help='The full ace command to run (in quotes).')
+
+    # Action: 'list'
+    list_jobs_parser = schedule_actions.add_parser('list', help='List all scheduled tasks.')
+
+    # Action: 'remove'
+    remove_job_parser = schedule_actions.add_parser('remove', help='Remove a task by its ID.')
+    remove_job_parser.add_argument('job_id', type=int, help='The ID of the job to remove.')
+
+    # --- NEW: Command Group 'scheduler' (for the watcher process) ---
+    scheduler_parser = subparsers.add_parser('scheduler', help='Control the scheduler watcher process.')
+    scheduler_parser.add_argument('action', choices=['start'], help='Action to perform on the scheduler.')
+
+    dashboard_parser = subparsers.add_parser('dashboard', help='Control the A.C.E. tmux dashboard.')
+    dashboard_parser.add_argument('action', choices=['start'], help='Action to perform on the dashboard.')
+
 
     # This line reads all the arguments that were typed in the terminal
     args = parser.parse_args()
@@ -135,6 +162,32 @@ def main():
         result = vanguard.generate_git_overview()
         if result:
             print(result)
+
+    elif args.command == 'dashboard':
+        if args.action == 'start':
+            dashboard_manager.start_dashboard()
+
+    elif args.command == 'schedule':
+        if args.action == 'add':
+            result = task_scheduler.add_scheduled_job(args.time_string, args.command_string)
+            print(result)
+        elif args.action == 'list':
+            jobs = task_scheduler.list_scheduled_jobs()
+            if isinstance(jobs, str):
+                print(jobs)
+            else:
+                print("--- A.C.E. Scheduled Tasks ---")
+                for job in jobs:
+                    print(f"  ID: {job['id']} | Rule: '{job['time_string']}' | Command: '{job['command']}'")
+                print("------------------------------")
+        elif args.action == 'remove':
+            result = task_scheduler.remove_scheduled_job(args.job_id)
+            print(result)
+
+    # --- NEW: Logic for the 'scheduler' command ---
+    elif args.command == 'scheduler':
+        if args.action == 'start':
+            task_scheduler.start_scheduler()
 
 # This standard Python line ensures that the main() function is called only when the script is executed.
 if __name__ == "__main__":
