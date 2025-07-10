@@ -1,6 +1,7 @@
 import os
 import subprocess
 import json
+import concurrent.futures
 
 ACE_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 PROJECTS_FILE = os.path.join(ACE_ROOT_DIR, "projects.json")
@@ -19,6 +20,59 @@ def run_command(command, cwd):
     if result.returncode != 0:
         return None, result.stderr.strip()
     return result.stdout.strip(), None
+
+def check_project_status(project_info):
+    """
+    Checks the Git status and last commit for a single project.
+    Thhis is the function that each thread will run in parallel.
+    """
+
+    # Unpack project
+    nickname, details = project_info
+    project_path = details['local_path']
+
+    if not os.path.isdir(project_path):
+        return f"\n   - {nickname}:\n    Status: Path not found."
+
+    # Use git status
+    status, error = run_command("git  status --porcelain", cwd=project_path)
+    if error:
+        return f"  - {nickname}:\n  Status: Not a Git repository."
+
+    status_summary = " Up to date"
+    if status:
+        status_summary = " Uncommitted changes"
+
+    last_commit, error = run_command('git log -n 1 --pretty=format:"%s (%cr)"', cwd=project_path)
+    if error:
+        last_commit = "No commits found"
+
+    return f"   - {nickname}:\n  Status: {status_summary}\n   Last Commit: {last_commit}"
+
+def generate_git_overview():
+    """
+    Fetches the status of all registered projects in parallel using threads.
+    """
+    try:
+        with open(PROJECTS_FILE, 'r') as f:
+            projects = json.load(f)
+    except FileNotFoundError:
+        return "Project registry not found. Please register a project first."
+
+    if not projects:
+        return "No projects are registered with A.C.E. yet"
+
+    print("--- Git Project Overview")
+
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(check_project_status, projects.items())
+
+        for result in results:
+            print(result)
+
+    print("---------------------------")
+    return ""
 
 def save_workflow(nickname):
     """

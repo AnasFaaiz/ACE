@@ -69,13 +69,14 @@ def main():
     # Action Command: 'ace save'
     git_parser = subparsers.add_parser('save', help='The Vanguard: Save your project work.')
     git_parser.add_argument('nickname', type=str, help='The nickname of the registered project to save.')
+    
+    # New command: 'ace overview'
+    overview_parser = subparsers.add_parser('overview', help='Get a high-level overview of all registered Git projects.')
 
-
-    # This line reads all the arguments that were typed in the terminal.
+    # This line reads all the arguments that were typed in the terminal
     args = parser.parse_args()
 
     # --- Logic to call the correct function ---
-    
     if args.command == 'project':
         if args.action == 'create':
             # Interactive part of workflow
@@ -129,6 +130,11 @@ def main():
     elif args.command == 'save':
         result = vanguard.save_workflow(args.nickname)
         print(result)
+
+    elif args.command == 'overview':
+        result = vanguard.generate_git_overview()
+        if result:
+            print(result)
 
 # This standard Python line ensures that the main() function is called only when the script is executed.
 if __name__ == "__main__":
