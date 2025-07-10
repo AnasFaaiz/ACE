@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "time_string": "every 3 hours",
+        "command": "ace news --limit 7"
+    },
+    {
+        "id": 2,
+        "time_string": "every 1 minute",
+        "command": "ace news --limit 1"
+    }
+]
