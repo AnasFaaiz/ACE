@@ -32,41 +32,29 @@ def start_dashboard():
 
     # Create the new, detached tmux session.
     run_tmux_command(f"tmux new-session -d -s {SESSION_NAME}")
-
-    # --- THE CORRECTED LAYOUT LOGIC ---
-    # 1. Split the main window (pane 0) vertically. This creates a new pane (pane 1) on the right.
-    #    The '-p 60' flag makes the new right-hand pane take up 60% of the space.
     run_tmux_command(f"tmux split-window -h -p 60 -t {SESSION_NAME}:0.0")
-
-    # 2. Now, target the original, smaller pane on the left (pane 0) and split it horizontally.
-    #    This creates a new pane (pane 2) below it.
     run_tmux_command(f"tmux split-window -v -t {SESSION_NAME}:0.0")
 
-    # Our final pane layout is:
-    # Pane 0: Main Workspace (Right side)
-    # Pane 1: News Hub (Top-Left)
-    # Pane 2: Git Overview (Bottom-Left)
-
-    # Build the full, direct command for Python to avoid PATH issues.
     python_executable = sys.executable
-    # We must use the absolute path to main.py for reliability inside tmux.
     main_script_path = os.path.join(ACE_HOME, 'src', 'main.py')
     base_command = f"'{python_executable}' '{main_script_path}'"
 
-    # 3. Send the commands to the correct panes.
-    
     # Send the news command to the Top-Left pane (pane 1).
     print("Configuring News Hub pane...")
     news_command = f"watch -n 300 {base_command} news"
-    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.1 \"{news_command}\" C-m")
+    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.0 \"{news_command}\" C-m")
 
     # Send the overview command to the Bottom-Left pane (pane 2).
     print("Configuring Git Overview pane...")
     overview_command = f"watch -n 60 {base_command} overview"
-    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.2 \"{overview_command}\" C-m")
+    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.1 \"{overview_command}\" C-m")
 
     # Select the main workspace pane (pane 0) so the cursor is there when you start.
-    run_tmux_command(f"tmux select-pane -t {SESSION_NAME}:0.0")
+    run_tmux_command(f"tmux select-pane -t {SESSION_NAME}:0.2")
+
+    print("Creating Workspace window...")
+    run_tmux_command(f"tmux new-window -t {SESSION_NAME}:1 -n Workspace")
+    run_tmux_command(f"tmux select-window -t {SESSION_NAME}:1")
 
     # Attach to the new session to make it visible.
     print("Attaching to session...")
