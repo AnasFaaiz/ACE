@@ -1,10 +1,9 @@
 import os
 import json
 import requests
+import subprocess
 from dotenv import load_dotenv
 
-# --- Configuration ---
-# This part correctly loads your .env file from the root directory.
 ACE_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..'))
 
 dotenv_path = os.path.join(ACE_ROOT_DIR, '.env')
@@ -14,10 +13,7 @@ GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 PROJECTS_FILE = os.path.join(ACE_ROOT_DIR, "projects.json")
 
-
 def get_remote_url(repo_name):
-    # This function is correct and does not need changes.
-    # ... (code for get_remote_url remains the same) ...
     if not GITHUB_USERNAME or not GITHUB_TOKEN:
         return None, "CRITICAL ERROR: GITHUB_USERNAME or GITHUB_TOKEN not found. Please check your .env file."
     api_url = f"https://api.github.com/repos/{GITHUB_USERNAME}/{repo_name}"
@@ -29,18 +25,37 @@ def get_remote_url(repo_name):
         return repo_data.get("clone_url"), None
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 404:
-            return None, f"Repository '{repo_name}' not found on your GitHub account."
-        return None, f"An API error occurred: {e}"
+            return None, "NOT_FOUND"
+        return None, f"An API error occurred: {e.response.text}"
+
+def create_github_repo(repo_name, is_private):
+    """Creates a new repository on GitHub via the API."""
+    api_url = "https://api.github.com/user/repos"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+
+    data = {
+        "name": repo_name,
+        "private": is_private,
+        "description": f"Repository for the {repo_name} project, created by A.C.E."
+    }
+
+    print(f"Creating new {'private' if is_private else 'public'} repository on GitHub...")
+
+    try:
+        response = requests.post(api_url, headers=headers, json=data)
+        response.raise_for_status()
+        repo_data = response.json()
+        return repo_data.get("clone_url"), None
+    except requests.exceptions.HTTPError as e:
+        return None, f"Failed to create GitHub repository. API error: {e.response.text}"
 
 
 def register_project(project_path):
     """
     Scans the specified directory path and registers it as a project with A.C.E.
     """
-    # It now uses the 'project_path' given by main.py instead of os.getcwd().
     local_path = os.path.abspath(project_path)
     
-    # We add a check to make sure the path is valid before continuing.
     if not os.path.isdir(local_path):
         return f"Error: The path '{local_path}' does not exist or is not a directory."
         
@@ -51,7 +66,34 @@ def register_project(project_path):
     print("Querying GitHub for remote repository URL...")
     remote_url, error = get_remote_url(project_nickname)
     
-    if error:
+    if error == "NOT_FOUND":
+        print(f"Repository '{project_nickname}' not found on your GitHub account.")
+
+        should_create = input("Would you like to create a new repository on GitHub with this name? [y/n] ").lower().strip()
+
+        if should_create in ['y', 'yes', '']:
+            visibility = input("Should the repository be private? [y/n] ").lower().strip()
+            is_private = visibility in ['y', 'yes']
+
+            remote_url, error = create_github_repo(project_nickname, is_private)
+
+            if error:
+                return f"Could not create repository: {error}"
+
+            print(f" Successfully created new repository:{remote_url}")
+
+            print("Linking local project to new remote repository..")
+
+            is_git_repo = os.path.isdir(os.path.join(local_path, '.git'))
+
+            if not is_git_repo:
+                subprocess.run(['git', 'init'], cwd=local_path, capture_output=True)
+            subprocess.run(['git', 'remote', 'add', 'origin', remote_url], cwd=local_path, capture_output=True)
+            print("..Done")
+
+        else:
+            return "Registration cancelled by user."
+    elif error:
         return f"Could not register project. Error: {error}"
 
     print(f"Found remote URL: {remote_url}")
