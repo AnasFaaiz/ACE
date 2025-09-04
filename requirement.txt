@@ -1,0 +1,25 @@
+# ==========================================================
+# A.C.E. Project Dependencies
+# Use 'pip3 install -r requirements.txt' to install all.
+# ==========================================================
+
+# For making HTTP requests to APIs (GitHub, News)
+requests
+
+# For securely loading credentials from the .env file
+python-dotenv
+
+# For parsing RSS feeds in the News Hub feature
+feedparser
+
+# For the Task Scheduler feature
+schedule
+
+# For converting speech-to-text in the voice interface
+SpeechRecognition
+
+# For converting text-to-speech (works offline)
+pyttsx3
+
+# For accessing the microphone (required by SpeechRecognition)
+PyAudio
