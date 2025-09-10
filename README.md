@@ -85,9 +85,9 @@ cd ace-system
 ```
 
 #### 2. Install Python Dependencies
-The `requirements.txt` file contains all necessary Python packages:
+The `requirement.txt` file contains all necessary Python packages:
 ```bash
-pip3 install -r requirements.txt
+pip3 install -r requirement.txt
 ```
 
 **What gets installed:**
