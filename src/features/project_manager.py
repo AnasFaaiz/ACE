@@ -147,3 +147,15 @@ def get_navigation_command(nickname):
     except FileNotFoundError:
         print("\033[91m\033[1mError: Project registry not found. Please register a project first.\033[0m")
         return None
+
+def load_projects():
+    """Returns the projects.json content as a dictionary."""
+    if not os.path.exists(PROJECTS_FILE):
+        return {}
+
+    try:
+        with open(PROJECTS_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {}
+

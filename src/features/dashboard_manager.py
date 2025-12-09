@@ -31,7 +31,7 @@ def start_dashboard():
     print(f"--- Launching A.C.E. Dashboard in new tmux session: '{SESSION_NAME}' ---")
 
     # Create the new, detached tmux session.
-    run_tmux_command(f"tmux new-session -d -s {SESSION_NAME}")
+    run_tmux_command(f"tmux new-session -d -s {SESSION_NAME} 'zsh --no-rcs --no-globalrcs'")
     run_tmux_command(f"tmux split-window -h -p 60 -t {SESSION_NAME}:0.0")
     run_tmux_command(f"tmux split-window -v -t {SESSION_NAME}:0.0")
 
