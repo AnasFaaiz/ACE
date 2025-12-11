@@ -1,36 +1,50 @@
-# A.C.E. - Automated Command Environment
+# A.C.E. — Automated Command Environment
 
-> A personalized AI assistant that lives in your terminal, designed to understand natural language and automate your daily developer tasks.
+> **Your personal AI-powered developer assistant that lives in the terminal.**  
+A.C.E. understands your intentions, automates your workflow, manages your projects, and provides a unified command ecosystem — all from the command line.
 
-[![Open Source](https://img.shields.io/badge/Open%20Source-❤️-red.svg)](https://github.com/yourusername/ace-system)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.7+-brightgreen.svg)](https://python.org)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-lightgrey.svg)](#installation)
-
----
-
-## What is A.C.E.?
-
-A.C.E. (Automated Command Environment) is a powerful, open-source command-line tool built with Python, designed to act as a centralized hub for developers. It streamlines workflows, manages projects, keeps you informed, and even provides a full "mission control" dashboard, all without leaving the comfort of your terminal.
-
-The core philosophy behind A.C.E. is to create an intelligent assistant that you can collaborate with, moving beyond simple scripts to a system that understands your intent and grows with your workflow.
+[![Open Source](https://img.shields.io/badge/Open%20Source-❤️-red.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)]()
+[![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-lightgrey.svg)]()
 
 ---
 
-## Installation
+## 🚀 What is A.C.E.?
 
-A.C.E. works on **Linux**, **macOS**, and **Windows (WSL)**. The installation is completely automated and takes less than a minute.
+A.C.E. (**Automated Command Environment**) is an extensible, modular, terminal-based assistant designed to supercharge developer productivity.
 
-### System Prerequisites
+It acts as a **central command hub**, helping you:
 
-#### Required
-- **Python 3.7+** (with pip)
-- **Git** (for project management features)
-- **Standard Unix tools** (sed, grep, ln - usually pre-installed)
+- Manage and navigate projects  
+- Automate Git workflows  
+- Fetch tech news  
+- Run scheduled tasks  
+- Launch a full tmux dashboard  
+- Back up your projects  
+- Scaffold new project templates  
 
-#### Optional but Recommended  
-- **tmux** (for dashboard features)
-- **curl** (for potential future network features)
+A.C.E. doesn’t just run commands — it **reduces friction**, understands your workflow, and feels like a teammate inside your terminal.
+
+---
+
+## 📦 Installation
+
+A.C.E. runs on **Linux**, **macOS**, and **Windows (via WSL)**.  
+Setup takes under a minute.
+
+---
+
+## ✅ System Requirements
+
+### Required
+- Python **3.8+**
+- Git
+- Standard Unix tools (`sed`, `grep`, `ln`)
+
+### Optional (Recommended)
+- `tmux` — enables the dashboard  
+- Audio libraries — for future voice features  
 
 ### Installing System Dependencies
 
@@ -85,9 +99,9 @@ cd ace-system
 ```
 
 #### 2. Install Python Dependencies
-The `requirement.txt` file contains all necessary Python packages:
+The `requirements.txt` file contains all necessary Python packages:
 ```bash
-pip3 install -r requirement.txt
+pip3 install -r requirements.txt
 ```
 
 **What gets installed:**
@@ -160,6 +174,12 @@ A.C.E. is a feature-rich suite of tools designed to supercharge your development
 ### 4. The tmux Dashboard
 * **One-Command Environment (`ace dashboard start`):** Instantly launches a persistent, multi-pane `tmux` session pre-configured as your development dashboard. Provides auto-updating panes for Git Overview and Tech News, alongside a main workspace for active development.
 
+### 5. Backup System
+
+* **ace backup** — Backup all registered projects
+* **ace backup <nickname>** — Backup one project
+* Backups include commit hash & timestamp.
+
 ---
 
 ## Architecture Overview
@@ -174,6 +194,7 @@ ace-system/
 │   │   ├── project_manager.py
 │   │   ├── vanguard.py
 │   │   ├── news_hub.py
+│   │   ├── backup_manager.py
 │   │   └── task_scheduler.py
 │   └── utils/               # Shared utilities
 ├── ace_launcher.sh          # Global command launcher
@@ -220,6 +241,10 @@ ace schedule "ace overview" --daily --time 09:00
 
 # Launch your persistent mission control dashboard
 ace dashboard start
+
+# Backups
+ace backup
+ace backup my-app
 ```
 
 ---
@@ -231,13 +256,10 @@ For full project management features, configure your GitHub token:
 
 ```bash
 # Create a .env file in the A.C.E. directory
+echo "GITHUB_USERNAME='your_username' > .env
 echo "GITHUB_TOKEN=your_github_personal_access_token_here" > .env
 ```
 
-### Customizing Templates
-Project templates are stored in `/src/templates/` and can be easily customized or extended.
-
----
 
 ## Troubleshooting
 
@@ -297,7 +319,7 @@ ace --help
 - **Operating System**: Linux, macOS, or Windows (with WSL)
 - **Python**: 3.7 or higher
 - **Dependencies**: See `requirements.txt`
-- **Optional**: tmux (for dashboard features), Git (for project management)
+- **Optional**: tmux (for dashboard features)
 
 ---
 
