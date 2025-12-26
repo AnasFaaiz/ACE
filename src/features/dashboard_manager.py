@@ -47,10 +47,10 @@ def start_dashboard():
     # Send the overview command to the Bottom-Left pane (pane 2).
     print("Configuring Git Overview pane...")
     overview_command = f"watch -n 60 {base_command} overview"
-    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.1 \"{overview_command}\" C-m")
+    run_tmux_command(f"tmux send-keys -t {SESSION_NAME}:0.2 \"{overview_command}\" C-m")
 
     # Select the main workspace pane (pane 0) so the cursor is there when you start.
-    run_tmux_command(f"tmux select-pane -t {SESSION_NAME}:0.2")
+    run_tmux_command(f"tmux select-pane -t {SESSION_NAME}:0.1")
 
     print("Creating Workspace window...")
     run_tmux_command(f"tmux new-window -t {SESSION_NAME}:1 -n Workspace")
