@@ -32,7 +32,7 @@ def start_dashboard():
 
     # Create the new, detached tmux session.
     run_tmux_command(f"tmux new-session -d -s {SESSION_NAME}")
-    run_tmux_command(f"tmux split-window -h -p 60 -t {SESSION_NAME}:0.0")
+    run_tmux_command(f"tmux split-window -h -l 60 -t {SESSION_NAME}:0.0")
     run_tmux_command(f"tmux split-window -v -t {SESSION_NAME}:0.0")
 
     run_tmux_command(
