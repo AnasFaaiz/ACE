@@ -35,6 +35,15 @@ def start_dashboard():
     run_tmux_command(f"tmux split-window -h -p 60 -t {SESSION_NAME}:0.0")
     run_tmux_command(f"tmux split-window -v -t {SESSION_NAME}:0.0")
 
+    run_tmux_command(
+        f"tmux set-option -g pane-border-status top"
+    )
+    run_tmux_command(
+        f"tmux set-option -g pane-border-format \" Pane #{{pane_index}} \""
+    )
+    
+    run_tmux_command(f"tmux select-layout -t {SESSION_NAME}:0 tiled")
+
     python_executable = sys.executable
     main_script_path = os.path.join(ACE_HOME, 'src', 'main.py')
     base_command = f"'{python_executable}' '{main_script_path}'"
