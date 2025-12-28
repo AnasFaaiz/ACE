@@ -110,7 +110,7 @@ def main():
         headlines = news_hub.get_news(
             source_name=args.source,
             limit=args.limit,
-            method=args.method
+            # method=args.method
         )
         print(f"\n--- Latest from {args.source.title()} ---")
         for h in headlines:
