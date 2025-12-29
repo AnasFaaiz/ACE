@@ -5,7 +5,8 @@ NEWS_SOURCES = {
     "techcrunch": "https://techcrunch.com/feed/",
 }
 
-def get_news(source_name="hackernews", limit=7):
+
+def get_news(source_name="hackernews", limit=7, method="rss"):
     """
     Fetches the latest news from a specified source's RSS feed.
 
@@ -23,8 +24,9 @@ def get_news(source_name="hackernews", limit=7):
     source_url = NEWS_SOURCES.get(source_name.lower())
 
     if not source_url:
-        return [f"Error: Unkown news source '{source_name}'. Available sources are: {list(NEWS_SOURCES.keys())}"]
-
+        return [
+            f"Error: Unkown news source '{source_name}'. Available sources are: {list(NEWS_SOURCES.keys())}"
+        ]
 
     try:
         # This is the main feedparser command.
