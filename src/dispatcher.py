@@ -42,9 +42,9 @@ def run_command(command: str, args: dict):
 
     elif command == "news":
         return news_hub.get_news(
-            source_name=args["source"],
-            limit=args["limit"],
-            method=args["method"],
+            source_name=args.get("source", "hackernews"),
+            limit=args.get("limit", 7),
+            method=args.get("method", "rss"),
         )
 
     elif command == "save":
