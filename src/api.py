@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from src.dispatcher import run_command
-from src.dispatcher import ACE_MODE, WEB_ALLOWED_COMMANDS
+from src.dispatcher import ACE_MODE
+from src.agent.commands import COMMANDS
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 
@@ -35,7 +36,9 @@ def capabilities():
     if ACE_MODE == "web":
         return {
             "mode": "web",
-            "allowed_commands": sorted(list(WEB_ALLOWED_COMMANDS)),
+            "allowed_commands": sorted(
+                name for name, cmd in COMMANDS.items() if cmd.get("web_safe")
+            ),
         }
 
     return {

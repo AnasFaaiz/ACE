@@ -1,0 +1,46 @@
+{
+  "include": ["src"],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "pythonVersion": "3.8",
+      "pythonPlatform": "All",
+      "extraPaths": []
+    }
+  ]
+}
+```
+
+**Why this works:** Setting `"root": "."` tells Pyright that the project root is the ACE folder itself, not the src folder. This allows it to properly resolve imports like `from agent.commands import COMMANDS`.
+
+### 3. Code Issues in Your Documents
+
+I noticed several **typos** in your code that could cause runtime errors:
+
+**In `vanguard.py` (Document 1):**
+- Line 17: `Thhis` → `This`
+- Line 23: `Chanegs` → `Changes`
+- Line 82: `specfic` → `specific`
+- Line 84: `assisstant` → `assistant`
+
+**In `project_manager.py` (Document 2):**
+- Line 7: `load_dotenv(dotenv_path=dotenv_path)` - this is redundant but not wrong
+
+### 4. Better Project Structure
+
+Based on your file explorer (Image 2), your structure should look like:
+```
+ACE/
+├── src/
+│   ├── agent/
+│   │   ├── __init__.py
+│   │   └── commands.py
+│   ├── features/
+│   │   ├── __init__.py
+│   │   ├── vanguard.py
+│   │   ├── project_manager.py
+│   │   └── voice_handler.py
+│   └── dispatcher.py
+├── pyrightconfig.json
+├── requirements.txt
+└── projects.json

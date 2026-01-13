@@ -2,13 +2,15 @@ import speech_recognition as sr
 import pyttsx3
 
 # Text-to-Speech Engine
-
 try:
     engine = pyttsx3.init()
 except Exception as e:
-    print("Warning: Could not initialize pyttsx3 speech engine. Voice output will be disabled.")
+    print(
+        "Warning: Could not initialize pyttsx3 speech engine. Voice output will be disabled."
+    )
     print(f"Error: {e}")
     engine = None
+
 
 def speak(text):
     """
@@ -26,8 +28,10 @@ def speak(text):
         # if engine fails, display a note
         print("Voice out is disabled.")
 
+
 # The Ears
 recognizer = sr.Recognizer()
+
 
 def listen_for_command():
     """
@@ -38,7 +42,7 @@ def listen_for_command():
     with sr.Microphone() as source:
         # This function listens for a moment.
         # Improves accuracy
-        recognizer.adjust_for_ambient_noise(source, duration=0.5)
+        recognizer.adjust_for_ambient_noise(source, duration=0.5)  # type: ignore
 
         # We call our own 'speak' function
         speak("At your service, Boss! What can I do for you?")
@@ -50,7 +54,7 @@ def listen_for_command():
             text = recognizer.recognize_google(audio)
             print(f"You said: {text}")
 
-            return text.lower()
+            return text.lower()  # type: ignore
         except sr.WaitTimeoutError:
             # Happens when nothing is said
             speak("I didn't hear. Please repeat")
@@ -61,5 +65,5 @@ def listen_for_command():
             return None
         except sr.RequestError as e:
             # Happens when problem with Network or API
-            speak(f"Sorry Boss, I couldn't connect to service, {e}")
+            speak(f"Sorry Boss, I couldn't connect to service: {e}")
             return None
