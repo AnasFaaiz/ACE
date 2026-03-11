@@ -94,7 +94,7 @@ sudo dnf install python3-pyaudio portaudio-devel
 
 #### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/ace-system.git
+git clone https://github.com/AnasFaaiz/ace-system.git
 cd ace-system
 ```
 
