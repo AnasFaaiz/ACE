@@ -35,7 +35,7 @@ COMMANDS: Dict[str, CommandDef] = {
         ],
     },
     "overview": {
-        "handler": lambda _args: vanguard.generate_git_overview(),
+        "handler": lambda args: vanguard.generate_git_overview(),
         "description": "Show what you are currently working on",
         "web_safe": True,
         "examples": [
@@ -45,7 +45,7 @@ COMMANDS: Dict[str, CommandDef] = {
         ],
     },
     "project.list": {
-        "handler": lambda _args: project_manager.list_registered_projects(),
+        "handler": lambda args: project_manager.list_registered_projects(),
         "description": "List all registered projects",
         "web_safe": True,
         "examples": [
@@ -55,7 +55,7 @@ COMMANDS: Dict[str, CommandDef] = {
         ],
     },
     "help": {
-        "handler": lambda _args: {
+        "handler": lambda args: {
             "commands": sorted(COMMANDS.keys()),
             "usage": "You can type commands or natural language",
             "examples": [
@@ -73,7 +73,7 @@ COMMANDS: Dict[str, CommandDef] = {
         ],
     },
     "memory": {
-        "handler": lambda _args: agent_memory.summary(),
+        "handler": lambda args: agent_memory.summary(),
         "description": "Show what you were last working on",
         "web_safe": True,
         "examples": [

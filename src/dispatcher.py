@@ -3,6 +3,7 @@ import os
 from src.agent.commands import COMMANDS
 from src.agent.intent import interpret_intent
 from src.agent.memory import agent_memory
+from src.agent.recommend import recommend_next
 from src.features import (
     project_manager,
     project_scaffolder,
@@ -55,41 +56,6 @@ def _execute_system_command(command: str, args: dict):
         os.makedirs(location, exist_ok=True)
         return project_scaffolder.create_project(name, template, location)
 
-    # elif command == "news":
-    #     return news_hub.get_news(
-    #         source_name=args.get("source", "hackernews"),
-    #         limit=args.get("limit", 7),
-    #         method=args.get("method", "rss"),
-    #     )
-
-    # elif command == "overview":
-    #     return vanguard.generate_git_overview()
-    #
-    # elif command == "memory":
-    #     memory = agent_memory.summary()
-    #
-    #     if not memory["last_intent"]:
-    #         return {
-    #             "message": "I don't have enough context yet.",
-    #             "hint": "Try running a command first.",
-    #         }
-    #     return {
-    #         "message": f"you were last working on: {memory['working_context']}",
-    #         "last_command": memory["last_command"],
-    #         "recent_intents": memory["recent_intents"],
-    #     }
-    #
-    # elif command == "help":
-    #     return {
-    #         "commands": sorted(WEB_ALLOWED_COMMANDS),
-    #         "note": "Natural language supported in web mode",
-    #         "examples": [
-    #             "latest tech news",
-    #             "what am I working on",
-    #             "list my projects",
-    #         ],
-    #     }
-
     elif command == "dashboard.start":
         dashboard_manager.start_dashboard()
         return "Dashboard started"
@@ -138,16 +104,17 @@ def run_command(command: str, args: dict):
             agent_memory.record(
                 intent=analysis["intent"],
                 command=f"ace {analysis['intent'].replace('.', ' ')}",
-                context=f"User intent: {analysis['intent']}",
+                context=COMMANDS[analysis["intent"]]["description"],
             )
-
+            result = _execute_registry_command(analysis["intent"], {})
             return {
                 "agent": "ACE",
                 "message": analysis["message"],
                 "interpreted_as": analysis["intent"],
                 "confidence": analysis["confidence"],
                 "suggestion": f"ace {analysis['intent'].replace('.', ' ')}",
-                "result": _execute_registry_command(analysis["intent"], {}),
+                "result": result,
+                "next_suggestions": recommend_next(analysis["intent"]),
             }
 
         return {
@@ -165,8 +132,13 @@ def run_command(command: str, args: dict):
     if command in COMMANDS:
         if ACE_MODE == "web" and not COMMANDS[command]["web_safe"]:
             return {"error": f"Command '{command}' not allowed in web mode."}
+        result = _execute_registry_command(command, args)
 
-        return _execute_registry_command(command, args)
+        return {
+            "agent": "ACE",
+            "result": result,
+            "next_suggestions": recommend_next(command),
+        }
 
     result = _execute_system_command(command, args)
     if result is not None:
