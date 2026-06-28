@@ -82,6 +82,9 @@ def main():
     backup_parser = subparsers.add_parser("backup", help="Backup one or all projects.")
     backup_parser.add_argument("nickname", nargs="?", help="Specific project to backup")
 
+    # ---------------- TUI COMMAND ------------------
+    tui_parser = subparsers.add_parser('tui', help='Launch the ACE Textual User Interface.')
+    
     # Parse arguments
     args = parser.parse_args()
 
@@ -167,6 +170,12 @@ def main():
 
         else:
             print(backup_manager.backup_all_projects()) 
+
+    #------------------- TUI Logic --------------
+    elif args.command == 'tui':
+        from src.tui.app import AceTUI
+        app = AceTUI()
+        app.run()
 
 if __name__ == "__main__":
     main()

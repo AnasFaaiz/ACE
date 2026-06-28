@@ -1,0 +1,29 @@
+Screen {
+    layout: horizontal;
+  }
+
+#sidebar {
+  width: 25;
+  height: 100%;
+  dock: left;
+  border-right: solid $primary;
+  background: $panel;
+  padding: 1 2;
+}
+
+#main-area {
+  width: 1fr;
+  height: 100%;
+  layout: vertical;
+}
+
+#chat-log {
+  height: 1fr;
+  border: blank;
+  padding: 0 1;
+}
+
+#chat-input {
+  dock: bottom;
+  margin: 1 1;
+}
