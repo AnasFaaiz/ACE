@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ace-cli"
+version = "0.2.0"
+description = "Automated Command Environment (A.C.E)"
+readme = "README.md"
+author = [
+  {name = "Anas Faaiz"}
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console :: Textual",
+  "Operating System :: POSIX :: Linux"
+]
+dependencies = [
+  "request>=2.25.0",
+  "python-dotenv>=0.19.0",
+  "feedparser>=6.0.0",
+  "schedule>=1.1.0",
+  "textual>=0.50.0"
+]
+
+[project.scripts]
+ace = "src.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

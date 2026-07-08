@@ -35,7 +35,7 @@ def check_project_status(project_info):
         return f"\n   - {nickname}:\n    Status: Path not found."
 
     # Use git status
-    status, error = run_command("git  status --porcelain", cwd=project_path)
+    status, error = run_command("git status --porcelain", cwd=project_path)
     if error:
         return f"  - {nickname}:\n  Status: Not a Git repository."
 
