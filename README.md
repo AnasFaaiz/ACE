@@ -1,11 +1,11 @@
 # A.C.E. — Automated Command Environment
 
-> **Your personal AI-powered developer assistant that lives in the terminal.**  
-A.C.E. understands your intentions, automates your workflow, manages your projects, and provides a unified command ecosystem — all from the command line.
+> **Your personal developer assistant that lives in the terminal.**
+> A.C.E. manages your projects, automates your Git workflow, runs scheduled tasks, and gives you a unified command ecosystem — all from the command line.
 
-[![Open Source](https://img.shields.io/badge/Open%20Source-❤️-red.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)]()
-[![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg)]()
+[![CI](https://github.com/AnasFaaiz/ACE/actions/workflows/ci.yml/badge.svg)](https://github.com/AnasFaaiz/ACE/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)]()
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-lightgrey.svg)]()
 
 ---
@@ -16,39 +16,56 @@ A.C.E. (**Automated Command Environment**) is an extensible, modular, terminal-b
 
 It acts as a **central command hub**, helping you:
 
-- Manage and navigate projects  
-- Automate Git workflows  
-- Fetch tech news  
-- Run scheduled tasks  
-- Launch a full tmux dashboard  
-- Back up your projects  
-- Scaffold new project templates  
+- Manage and navigate projects
+- Automate Git workflows
+- Fetch tech news
+- Run scheduled tasks
+- Launch a full tmux dashboard
+- Back up your projects
+- Scaffold new project templates
 
-A.C.E. doesn’t just run commands — it **reduces friction**, understands your workflow, and feels like a teammate inside your terminal.
-
----
-
-## 📦 Installation
-
-A.C.E. runs on **Linux**, **macOS**, and **Windows (via WSL)**.  
-Setup takes under a minute.
+A.C.E. doesn't just run commands — it **reduces friction**, understands your workflow, and feels like a teammate inside your terminal.
 
 ---
 
-## ✅ System Requirements
+## ✅ Requirements
 
 ### Required
-- Python **3.8+**
-- Git
-- Standard Unix tools (`sed`, `grep`, `ln`)
 
-### Optional (Recommended)
-- `tmux` — enables the dashboard  
-- Audio libraries — for future voice features  
+- **Python 3.10+**
+- **Git**
+- **pipx** — recommended installer (keeps A.C.E. in its own isolated environment)
 
-### Installing System Dependencies
+### Optional
 
-#### tmux (Required for Dashboard Features)
+- **tmux** — enables the `ace dashboard` feature
+- Audio libraries — for experimental voice features
+
+### Installing pipx
+
+**Arch Linux:**
+```bash
+sudo pacman -S python-pipx
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install pipx
+```
+
+**macOS:**
+```bash
+brew install pipx
+```
+
+Then make sure pipx's bin directory is on your PATH:
+```bash
+pipx ensurepath
+```
+
+Restart your shell afterwards.
+
+### Installing tmux (Required for Dashboard Features)
 
 **Ubuntu/Debian:**
 ```bash
@@ -72,8 +89,10 @@ sudo dnf install tmux
 sudo pacman -S tmux
 ```
 
-#### Audio Dependencies (Optional - for Voice Features)
-If you want to use voice features, install system audio libraries:
+### Audio Dependencies (Optional — Experimental)
+
+Voice features are experimental and not installed by default. If you want to
+experiment with them, install your system's audio libraries first:
 
 **Ubuntu/Debian:**
 ```bash
@@ -90,205 +109,313 @@ brew install portaudio
 sudo dnf install python3-pyaudio portaudio-devel
 ```
 
-### Step-by-Step Installation
+---
 
-#### 1. Clone the Repository
+## 📦 Installation
+
+### Option 1 — Install a released version
+
 ```bash
-git clone https://github.com/AnasFaaiz/ace-system.git
-cd ace-system
+pipx install git+https://github.com/AnasFaaiz/ACE@v0.2.0
 ```
 
-#### 2. Install Python Dependencies
-The `requirements.txt` file contains all necessary Python packages:
+### Option 2 — Install from source (for development)
+
 ```bash
-pip3 install -r requirements.txt
+git clone https://github.com/AnasFaaiz/ACE.git
+cd ACE
+pipx install --editable .
 ```
 
-**What gets installed:**
-- `requests` - For making HTTP requests to APIs (GitHub, News)
-- `python-dotenv` - For securely loading credentials from .env file  
-- `feedparser` - For parsing RSS feeds in the News Hub feature
-- `schedule` - For the Task Scheduler feature
-- `SpeechRecognition` - For speech-to-text (optional voice features)
-- `pyttsx3` - For text-to-speech (optional voice features)  
-- `PyAudio` - For microphone access (required by SpeechRecognition)
+`--editable` links the install to your working copy, so code changes take
+effect immediately without reinstalling.
 
-**Note:** If you encounter issues with audio packages (PyAudio, SpeechRecognition, pyttsx3), you can install only the core dependencies:
+### Set up the `acego` navigation function
 
 ```bash
-# Core dependencies only (recommended for most users)
-pip3 install requests python-dotenv feedparser schedule
-
-# Full installation with voice features (requires audio system setup)
-pip3 install -r requirements.txt
+ace shell-init --install
+source ~/.zshrc     # or ~/.bashrc
 ```
 
-#### 3. Run the Automated Installer
+**Why this step is separate:** `acego` changes your shell's working directory,
+and a child process can never change its parent's directory. That makes it a
+shell *function* rather than an executable, and shell functions have to be
+defined by your shell's startup file. `ace shell-init --install` writes the
+function into your rc file between marker comments, so re-running it after an
+upgrade replaces the block instead of duplicating it.
+
+Prefer to see what it writes first?
+
 ```bash
-chmod +x install.sh
-./install.sh
+ace shell-init              # prints the function, changes nothing
 ```
 
-The installer will:
-- Create a global `ace` command
-- Add `~/.local/bin` to your PATH
-- Install the `acego` navigation function
-- Verify the installation
+Or source it live instead of embedding it, by adding this line to your rc file:
 
-#### 4. Reload Your Shell
 ```bash
-source ~/.zshrc  # or ~/.bashrc for Bash users
-# OR simply restart your terminal
+eval "$(ace shell-init --shell zsh)"
 ```
 
-### Verify Installation
+### Verify
+
 ```bash
-# Test the ace command
+ace --version
 ace --help
-
-# Test project navigation
-acego --help
+type acego        # → "acego is a shell function from ~/.zshrc"
 ```
 
-That's it! A.C.E. is now installed globally and ready to use from anywhere in your terminal.
+---
+
+## Python Dependencies
+
+Installed automatically by pipx. Declared in `pyproject.toml`:
+
+| Package | Purpose |
+|---|---|
+| `requests` | HTTP calls to the GitHub and news APIs |
+| `python-dotenv` | Loads credentials from `.env` |
+| `feedparser` | Parses RSS feeds for the News Hub |
+| `schedule` | Powers the task scheduler |
+| `textual` | Renders the TUI dashboard |
 
 ---
 
 ## Core Features
 
-A.C.E. is a feature-rich suite of tools designed to supercharge your development process.
-
 ### 1. Workspace & Project Management
-* **Project Scaffolder (`ace project create`):** Instantly create new project structures from predefined templates for modern tech stacks (React, Python, Next.js, etc.).
-* **Project Registry (`ace project register`, `ace project list`):** A.C.E. maintains a `projects.json` memory file of all your projects. It can automatically scan existing local Git repositories, discover corresponding GitHub URLs via the API, and register them for future use.
-* **Quick Navigation (`acego <project>`):** A special shell function that allows you to instantly `cd` into any registered project directory, no matter where you are in the filesystem.
+
+* **Project Scaffolder (`ace project create`):** Instantly create new project structures from predefined templates for modern tech stacks (React, Next.js, Vite, Python).
+* **Project Registry (`ace project register`, `ace project list`):** A.C.E. maintains a registry of all your projects. It scans existing local Git repositories, discovers corresponding GitHub URLs via the API, and can create the remote repo for you if it doesn't exist yet.
+* **Quick Navigation (`acego <project>`):** A shell function that instantly `cd`s into any registered project directory, no matter where you are in the filesystem.
 
 ### 2. The Vanguard (Intelligent Git Assistant)
-* **Interactive Save (`ace save`):** A safe and powerful workflow that shows you a status of your changes, asks for confirmation, and then automatically runs `git add .`, `git commit`, and `git push` to your current feature branch. Includes safety locks to prevent accidental pushes to `main`.
-* **Mission Control Overview (`ace overview`):** A multi-threaded command that runs in parallel to give you a near-instant, high-level summary of Git status and most recent commits for all registered projects.
+
+* **Interactive Save (`ace save`):** Shows a status of your changes, asks for confirmation, then runs `git add .`, `git commit`, and `git push` to your current feature branch. Includes safety locks to prevent accidental pushes to `main`.
+* **Mission Control Overview (`ace overview`):** A multi-threaded command that runs in parallel to give a near-instant summary of Git status and recent commits across all registered projects.
 
 ### 3. Information & Automation Hub
-* **Tech News Tracker (`ace news`):** Fetch the latest trending headlines from developer-focused sources like Hacker News directly in your terminal, with options to filter by source.
-* **Task Scheduler (`ace schedule`, `ace scheduler`):** An internal cron-like system. Schedule any A.C.E. command to run at specific times, list scheduled jobs, and run a persistent watcher process to execute them automatically.
+
+* **Tech News Tracker (`ace news`):** Fetch trending headlines from developer-focused sources like Hacker News, with options for source and fetch method (RSS, API, or scrape).
+* **Task Scheduler (`ace schedule`, `ace scheduler`):** An internal cron-like system. Schedule any A.C.E. command to run at a given time, list scheduled jobs, and run a persistent watcher process to execute them.
 
 ### 4. The tmux Dashboard
+
 * **One-Command Environment (`ace dashboard start`):** Instantly launches a persistent, multi-pane `tmux` session pre-configured as your development dashboard. Provides auto-updating panes for Git Overview and Tech News, alongside a main workspace for active development.
 
-### 5. Backup System
+### 5. The TUI
 
-* **ace backup** — Backup all registered projects
-* **ace backup <nickname>** — Backup one project
+* **`ace tui`** — a full Textual interface over the same features, for when you'd rather browse than type.
+
+### 6. Backup System
+
+* **`ace backup`** — back up all registered projects
+* **`ace backup <nickname>`** — back up one project
 * Backups include commit hash & timestamp.
 
 ---
 
 ## Architecture Overview
 
-A.C.E. is built using a professional, modular Python package structure designed for maintainability and extensibility.
-
 ```
-ace-system/
+ACE/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml               # Test matrix across Python 3.10–3.14
+│       └── release.yml          # Tag-triggered build + GitHub Release
+├── config/
+│   └── settings.toml            # Application configuration
+├── data/
+│   ├── project.json             # Project registry
+│   └── schedule.json            # Scheduled task store
 ├── src/
-│   ├── main.py              # Entry point and command router
-│   ├── features/            # Modular feature implementations
+│   ├── main.py                  # Entry point and command router
+│   ├── shell.py                 # acego shell function + rc-file installer
+│   ├── core/                    # Application internals
+│   │   ├── config.py            # Settings loading
+│   │   ├── context.py           # Shared runtime context
+│   │   ├── memory.py            # Persistence layer
+│   │   └── service_manager.py   # Service lifecycle
+│   ├── features/                # Modular feature implementations
 │   │   ├── project_manager.py
+│   │   ├── project_scaffolder.py
 │   │   ├── vanguard.py
 │   │   ├── news_hub.py
 │   │   ├── backup_manager.py
-│   │   └── task_scheduler.py
-│   └── utils/               # Shared utilities
-├── ace_launcher.sh          # Global command launcher
-├── install.sh               # Automated installer
-├── requirements.txt         # Python dependencies
-├── projects.json            # Project registry (created on first use)
-├── schedule.json            # Task scheduler data
-└── .env                     # Secure credential storage
+│   │   ├── dashboard_manager.py
+│   │   ├── task_scheduler.py
+│   │   └── voice_handler.py     # Experimental
+│   ├── tui/                     # Textual dashboard
+│   │   ├── app.py
+│   │   ├── screens/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── tools/
+│   │   └── widgets/
+│   └── utils/
+│       └── helpers.py
+├── pyproject.toml               # Package metadata, dependencies, entry point
+├── CHANGELOG.md
+└── .env                         # Secure credential storage (git-ignored)
 ```
 
-**Key Components:**
-- **`/src/main.py`**: Command parser and feature dispatcher
-- **`/src/features/`**: Modular feature implementations for easy extension
-- **`projects.json` & `schedule.json`**: A.C.E.'s persistent memory
-- **`.env`**: Secure storage for API tokens and credentials
+**Key components:**
+
+- **`src/main.py`** — argparse command parser and feature dispatcher
+- **`src/shell.py`** — the `acego` snippet and the logic that installs it
+- **`src/core/`** — configuration, context, and service management
+- **`src/features/`** — one module per feature, lazily imported so startup stays fast
+- **`data/`** — A.C.E.'s persistent memory; git-ignored, created on first use
+- **`.env`** — GitHub credentials; git-ignored, never commit this
 
 ---
 
 ## Usage Examples
 
-Once installed, interact with A.C.E. from anywhere in your terminal:
-
 ```bash
-# Get a high-level overview of all your projects
+# Register a project (nickname is taken from the directory name)
+ace project register /path/to/my-project
+
+# List everything A.C.E. knows about
+ace project list
+
+# Jump to a project from anywhere
+acego my-project
+
+# Scaffold a new project from a template
+ace project create my-new-app
+
+# High-level Git status across all projects
 ace overview
 
-# Register a new project for quick access
-ace project register /path/to/my-project my-nickname
+# Save your work with the intelligent Git workflow
+ace save my-project
 
-# Save your work with intelligent Git workflow
-ace save my-project-nickname
+# Tech news
+ace news --source hackernews --limit 10 --method rss
 
-# Instantly navigate to any registered project
-acego my-project-nickname
+# Schedule a command, then run the watcher
+ace schedule add "09:00" "ace overview"
+ace schedule list
+ace scheduler start
 
-# Create a new project from templates
-ace project create my-new-app --template react
-
-# Stay updated with tech news
-ace news --source hackernews
-
-# Schedule automated tasks
-ace schedule "ace overview" --daily --time 09:00
-
-# Launch your persistent mission control dashboard
+# Launch the tmux mission control dashboard
 ace dashboard start
+
+# Launch the TUI
+ace tui
 
 # Backups
 ace backup
-ace backup my-app
+ace backup my-project
 ```
 
 ---
 
 ## Configuration
 
-### Setting up GitHub Integration
-For full project management features, configure your GitHub token:
+### GitHub Integration
+
+Project registration queries the GitHub API to find (or create) the matching
+remote repository. Create a `.env` file in the A.C.E. directory:
 
 ```bash
-# Create a .env file in the A.C.E. directory
-echo "GITHUB_USERNAME='your_username' > .env
-echo "GITHUB_TOKEN=your_github_personal_access_token_here" > .env
+GITHUB_USERNAME=your_username
+GITHUB_TOKEN=your_github_personal_access_token
 ```
 
+The token needs `repo` scope. **`.env` is git-ignored — never commit it.**
+If you ever push a token by accident, revoke it on GitHub rather than just
+deleting the file.
+
+### Application Settings
+
+Non-secret configuration lives in `config/settings.toml`.
+
+---
+
+## Upgrading
+
+```bash
+cd /path/to/ACE
+git pull
+pipx install --editable . --force
+ace shell-init --install       # refresh the acego block if it changed
+source ~/.zshrc
+```
+
+Editable installs pick up code changes automatically, but a version bump in
+`pyproject.toml` requires the reinstall for `ace --version` to report it.
+
+---
 
 ## Troubleshooting
 
-### Common Installation Issues
+#### `ace: command not found`
 
-#### PyAudio Installation Fails
 ```bash
-# Install system audio dependencies first (see Audio Dependencies section above)
-# Then try installing just core dependencies:
-pip3 install requests python-dotenv feedparser schedule
-```
-
-#### tmux Command Not Found
-```bash
-# Install tmux using your system package manager (see tmux installation section above)
-```
-
-#### ace Command Not Found After Installation
-```bash
-# Ensure ~/.local/bin is in your PATH
+pipx ensurepath
+# then restart your shell, or:
 export PATH="$HOME/.local/bin:$PATH"
-source ~/.zshrc
 ```
+
+#### `acego: command not found`
+
+The function isn't defined in your shell. Run:
+
+```bash
+ace shell-init --install
+source ~/.zshrc
+type acego        # should report a shell function
+```
+
+#### `acego` cds to the wrong place, or errors with a usage dump
+
+Your rc file holds an old copy of the function. Re-run `ace shell-init --install`
+(it should say **updated**, not *installed*) and re-source your rc file. If it
+says *installed*, check for a duplicate block:
+
+```bash
+grep -c "acego START" ~/.zshrc      # should be 1
+```
+
+#### `externally-managed-environment` during install
+
+Arch and Debian block system-wide `pip install` (PEP 668). Use pipx, as above.
+
+#### `tmux: command not found`
+
+Install tmux with your system package manager (see the requirements section).
+
+---
+
+## Development
+
+```bash
+git clone https://github.com/AnasFaaiz/ACE.git
+cd ACE
+pipx install --editable .
+ace shell-init --install
+```
+
+CI runs on every push to `main`, testing installation and CLI startup across
+Python 3.10 through 3.14.
+
+### Cutting a release
+
+```bash
+# 1. Bump version in pyproject.toml
+# 2. Move [Unreleased] into a dated section in CHANGELOG.md
+git commit -am "release: 0.3.0"
+git tag -a v0.3.0 -m "0.3.0"
+git push && git push --tags
+```
+
+The release workflow verifies the tag matches `pyproject.toml`, builds the
+wheel and sdist, and publishes a GitHub Release with both attached.
 
 ---
 
 ## Contributing
-
-A.C.E. is an open-source project and contributions are welcome! Here's how you can help:
 
 1. **Fork the repository**
 2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
@@ -296,53 +423,19 @@ A.C.E. is an open-source project and contributions are welcome! Here's how you c
 4. **Push to the branch**: `git push origin feature/amazing-feature`
 5. **Open a Pull Request**
 
-### Development Setup
-```bash
-# Clone your fork
-git clone https://github.com/yourusername/ace-system.git
-cd ace-system
-
-# Install development dependencies
-pip3 install -r requirements.txt
-
-# Install in development mode
-./install.sh
-
-# Make changes and test
-ace --help
-```
-
----
-
-## System Requirements
-
-- **Operating System**: Linux, macOS, or Windows (with WSL)
-- **Python**: 3.7 or higher
-- **Dependencies**: See `requirements.txt`
-- **Optional**: tmux (for dashboard features)
-
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgments
-
-- Built with Python and love for the developer community
-- Inspired by the need for intelligent terminal workflows
-- Special thanks to all contributors and users who help make A.C.E. better
+MIT — see [LICENSE](LICENSE).
 
 ---
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/ace-system/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/ace-system/discussions)
-- **Documentation**: [Wiki](https://github.com/yourusername/ace-system/wiki)
+- **Issues**: [GitHub Issues](https://github.com/AnasFaaiz/ACE/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/AnasFaaiz/ACE/discussions)
 
 ---
 
-*A.C.E. - Because your terminal should be as smart as you are.*
+*A.C.E. — Because your terminal should be as smart as you are.*
