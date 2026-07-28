@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys 
-import os 
+import os
+from importlib.metadata import version, PackageNotFoundError
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
@@ -8,6 +9,22 @@ sys.path.insert(0, project_root)
 
 import argparse
 
+try:
+    __version__ = version("ace-cli")
+except PackageNotFoundError:
+    __version__ = "dev"
+
+def handle_shell_init(args):
+    from src import shell
+    target = args.shell or shell.detect_shell()
+
+    if args.install:
+        rc, action = shell.install(target)
+        print(f"acego {action} in {rc}")
+        print(f"Run: source {rc}")
+    else:
+        print(shell.snippet(target))
+        
 # Command dispatch handlers (lazy loading)
 
 def handle_project(args):
@@ -15,7 +32,10 @@ def handle_project(args):
     if args.action == 'register':
         print(project_manager.register_project(args.path))
     elif args.action == 'list':
-        print(project_manager.list_registered_projects())
+        if args.plain:
+            print("\n".join(project_manager.load_projects()))
+        else:
+            print(project_manager.list_registered_projects())
     elif args.action == 'go':
         project_path = project_manager.get_navigation_command(args.nickname)
         print(project_path)
@@ -94,26 +114,26 @@ def handle_tui(args):
     app.run()
 
 # Main ENtry & Parser 
-
 def main():
     parser = argparse.ArgumentParser(description="A.C.E. - Your Personal AI Deeveloper Assistant.")
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(dest='command', help='Available commands', required=True)
 
 
     # -------------- Project Commands ------------------------ 
     project_parser = subparsers.add_parser('project', help='Manage your registered projects')
     project_parser.set_defaults(func=handle_project)
-    project_actions = project_parser.add_subparsers(dest='action', help='Project Actions', required=True)
+    project_actions = project_parser.add_subparsers(dest='action', metavar='{regiser, list, create}', required=True)
 
     # -------------- Register Project
     register_parser = project_actions.add_parser('register', help='Register a project by path')
     register_parser.add_argument('path', type=str)
 
     # ---------------- List Projects 
-    project_actions.add_parser('list', help='List all registered projects')
-
+    list_parser = project_actions.add_parser('list', help='List all registered projects')
+    list_parser.add_argument('--plain', action='store_true', help=argparse.SUPPRESS)
     # --------------- Navigate project 
-    go_parser = project_actions.add_parser('go', help="Prints the project's path so you can cd into it")
+    go_parser = project_actions.add_parser('go')
     go_parser.add_argument('nickname', type=str)
 
     # ---------------- Create Project 
@@ -122,14 +142,14 @@ def main():
 
     # -------------------- News Command 
     news_parser = subparsers.add_parser('news', help='Fetch the Latest news from sources')
-    news_parser.set_defaults(funct=handle_news)
+    news_parser.set_defaults(func=handle_news)
     news_parser.add_argument('--source', type=str, default='hackernews')
     news_parser.add_argument('--limit', type=int, default=7)
     news_parser.add_argument('--method', type=str, default='rss', choices=['rss', 'api', 'scrape', 'all'], help="Choose news fetch type")
 
     # ---------------- Save Command 
     git_parser = subparsers.add_parser('save', help='The vanguard: Save your project')
-    git_parser.set_defaults(funct=handle_save)
+    git_parser.set_defaults(func=handle_save)
     git_parser.add_argument('nickname', type=str)
 
     # ------------------ OverView Command
@@ -143,7 +163,7 @@ def main():
 
     # --------------- Scheduler command 
     schedule_parser = subparsers.add_parser('schedule', help='Manage A.C.E. schedules')
-    schedule_parser.set_defaults(funct=handle_schedule)
+    schedule_parser.set_defaults(func=handle_schedule)
     schedule_actions = schedule_parser.add_subparsers(dest='action', required=True)
 
     add_job = schedule_actions.add_parser('add', help='Add a scheduled task')
@@ -169,12 +189,21 @@ def main():
     tui_parser = subparsers.add_parser('tui', help='Launch A.C.E. TUI Dashboard')
     tui_parser.set_defaults(func=handle_tui)
 
+    # ---------------- acego function
+    
+    shell_parser = subparsers.add_parser('shell-init', help='Set up the acego shell function')
+    shell_parser.set_defaults(func=handle_shell_init)
+    shell_parser.add_argument('--shell', default=None, choices=['bash', 'zsh', 'fish'])
+    shell_parser.add_argument('--install', action='store_true',
+                          help='Write the function into your shell rc file')
     # Parse arguments 
     args = parser.parse_args()
 
     # Route execution 
     if hasattr(args, 'func'):
         args.func(args)
+    else:
+        parser.error(f"no handler wired for '{args.command}'")
 
 if __name__ == "__main__":
     main()

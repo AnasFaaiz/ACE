@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import requests
 import subprocess
@@ -134,19 +135,22 @@ def list_registered_projects():
 
 # And the navigation function for the 'go' command
 def get_navigation_command(nickname):
-    """Looks up a project by its nickname in the registry and returns the 'cd' command."""
-    try:
-        with open(PROJECTS_FILE, 'r') as f:
-            projects = json.load(f)
-        if nickname in projects:
-            project_path = projects[nickname]['local_path']
-            return project_path  # Added quotes for paths with spaces
-        else:
-            print(f"\033[91m\033[1mError: Project nickname '{nickname}' not found in registry.\033[0m")
-            return None
-    except FileNotFoundError:
-        print("\033[91m\033[1mError: Project registry not found. Please register a project first.\033[0m")
-        return None
+    """Resolver for the acego shell function.
+    stdout = bare path only. Errors -> stderr, exit 1."""
+    projects = load_projects()
+
+    if not projects:
+        sys.exit("\033[91mError: no projects registered. Run 'ace project register <path>' first.\033[0m")
+
+    info = projects.get(nickname)
+    if not info:
+        sys.exit(f"\033[91mError: '{nickname}' is not registered.\033[0m")
+
+    path = info.get("local_path")
+    if not path or not os.path.isdir(path):
+        sys.exit(f"\033[91mError: '{nickname}' points at a missing path: {path}\033[0m")
+
+    return path
 
 def load_projects():
     """Returns the projects.json content as a dictionary."""
